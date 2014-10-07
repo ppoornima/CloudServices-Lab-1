@@ -31,20 +31,83 @@ firstName = ((queries[0].split("="))[1]).split("%22")[1];
 lastLoginDate = ((((queries[1].split("="))[1]).split("%22")[1]).split("%20"))[0];
 lastLoginTime = (((queries[1].split("="))[1]).split("%22")[1]).split("%20")[1];
 
-/* for ( i = 0, l = queryString.length; i < l; i++ ) {
-    temp = queries[i].split('=');
-    params[temp[0]] = temp[1];
-}  */
 $(document).ready(function(){
 	$("#userNameJQ").append(firstName);
 	$("#lastLoginTime").append(lastLoginDate+"\t"+lastLoginTime);
-	//$(".top_right").append("<p>TEST</p>");
 });
 
-//alert("Hello world \n "+ firstName+"\n"+lastLoginTime+"\n"+lastLoginDate);
+
+
+function getProductsfun(){
+	alert("button clicked!!");
+	
+	jQuery.ajax({
+	    type: "POST",
+	    url: "http://localhost:8080/CloudServices/rest/users/getProducts",
+	    data: "101",
+	    contentType: "application/json; charset=utf-8",
+	    dataType: "json",
+	    success: function (data, status, jqXHR) {
+	    	
+	    	if(JSON.stringify(data["statusCode"])== 200 )
+			{
+	    		alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
+	    		alert("data: \n"+ JSON.stringify(data["dataProducts"]));
+	    		var jsonData = JSON.parse(JSON.stringify(data["dataProducts"]));
+	    		//alert("Parse\n"+ jsonData);
+	    	
+	    		for (var i = 0; i < jsonData.length; i++) {
+	    		    var counter = jsonData[i];
+	    		    console.log(counter.productName);
+	    		    alert("Product Name" + counter.productName+ "\t Quantity:"+ counter.quantity+"\t Product Price"+counter.productPrice)
+	    	
+	    		    newRow = "<tr>" +
+	    	        "<td class='empid'>E333</td>" +
+	    	        "<td class='fname'>Fujita</td>" +
+	    	        "<td class='lname'>Makoto</td>" +
+	    	        "<td class='email'>fujita@devcurry.com</td>" +
+	    	        "<td class='age'>52</td>" +
+	    	    "</tr>";
+	    	    $('#someTable > tbody > tr:last').after(newRow);
+	    		
+	    		
+	    		}
+				
+				}
+			else
+				{
+				alert("Status Code: "+ JSON.stringify(data["statusCode"])+"\n Status Message:"+"Error in retreiving products");
+				
+				}
+					    },
+
+	    error: function (jqXHR, status) {            
+	    	alert(jqXHR+" "+status);
+	    }
+
+	});
+
+	function formToJSON() {
+	    return JSON.stringify({
+	    "firstName": $('#firstName').val(),
+	    "lastName": $('#lastName').val(),
+	    "email": $('#email').val(),
+	    "passwd": $('#passwd').val()
+	    });
+	}
+
+	
+}
 
 </script>
 
+<!-- <script type="text/javascript">
+
+function getProductsfun(){
+
+
+</script>
+ -->
 
 <!--end slider -->
 </head>
@@ -74,7 +137,7 @@ $(document).ready(function(){
 <div class="container">
 	<div class="header">
 	<div class="logo">
-
+					<button class="btn btn-primary" id="getProducts" onclick="getProductsfun()">PRODUCTS</button>
 			
 			<h3>Online Shopping Stores</h3>
 			

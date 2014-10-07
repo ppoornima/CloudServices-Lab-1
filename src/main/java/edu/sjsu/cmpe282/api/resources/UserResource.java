@@ -42,21 +42,28 @@ public class UserResource {
 	}
 	
 	@GET
-	@Path("/getCatalogs")
+	@Path("/getCatalog")
 	public String getCatalogs()
 	{
 		
-		return "";
+		return userdao.getCatalog();
 		
 	}
 	
-	@GET
+	@POST
 	@Path("/getProducts")
-	public String getProducts(String catalogName)
+	public String getProducts(String categoryID)
 	{
 		
 		
-		return "";
+		return userdao.getProducts(categoryID);
 	}
 	
+	@GET
+	@Path("/getCategory")
+	public String getCategory(String catalogID )
+	{
+	
+		return userdao.getCategory(catalogID);
+	}
 }

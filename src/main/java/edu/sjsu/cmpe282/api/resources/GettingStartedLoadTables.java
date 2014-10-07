@@ -19,7 +19,7 @@ import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 public class GettingStartedLoadTables {
 	static AmazonDynamoDBClient client;
     static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    static String productCatalogTableName = "product";
+    static String productCatalogTableName = "products";
    
     
     public static void main(String[] args) throws Exception {
@@ -53,118 +53,107 @@ public class GettingStartedLoadTables {
         try {
             // Add books.
             Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-            item.put("ProductID", new AttributeValue().withN("101"));
-            item.put("Title", new AttributeValue().withS("Book 101 Title"));
-            item.put("ISBN", new AttributeValue().withS("111-1111111111"));
-            item.put("Authors", new AttributeValue().withSS(Arrays.asList("Author1")));
-            item.put("Price", new AttributeValue().withN("2"));
-            item.put("Dimensions", new AttributeValue().withS("8.5 x 11.0 x 0.5"));
-            item.put("PageCount", new AttributeValue().withN("500"));
-            item.put("InPublication", new AttributeValue().withN("1"));
-            item.put("ProductCategory", new AttributeValue().withS("Book"));
-            
+
             PutItemRequest itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
+            
+            /*item.put("productID", new AttributeValue().withN("001"));
+            item.put("productName", new AttributeValue().withS("Acer V5-471P-6615 14 inch Touchscreen Laptop PC with Intel Core i5-3337U Processor, 4GB Memory, 500GB Hard Drive and Windows 8"));
+            item.put("productDescription", new AttributeValue().withS("Finally, there's a light and lean computing machine with touch:"
+            		+ " the V5-471P-6615 Acer Touchscreen Laptop. At only 1" 
+            		+"slim and super light, this laptop packs potent power and graphics, while integrating a touchscreen for exciting hands-on navigation. Open and close programs, browse online and breeze through photo albums"
+            		+ " - using nothing but your fingers with the V5-471P-6615 Acer Touchscreen Laptop.1"));
+            item.put("productPrice", new AttributeValue().withN("500"));
+            item.put("quantity", new AttributeValue().withN("10"));
+            item.put("categoryID", new AttributeValue().withS("100"));
+            
             client.putItem(itemRequest);
             item.clear();
             
-            item.put("ProductID", new AttributeValue().withN("102"));
-            item.put("Title", new AttributeValue().withS("Book 102 Title"));
-            item.put("ISBN", new AttributeValue().withS("222-2222222222"));
-            item.put("Authors", new AttributeValue().withSS(Arrays.asList("Author1", "Author2")));
-            item.put("Price", new AttributeValue().withN("20"));
-            item.put("Dimensions", new AttributeValue().withS("8.5 x 11.0 x 0.8"));
-            item.put("PageCount", new AttributeValue().withN("600"));
-            item.put("InPublication", new AttributeValue().withN("1"));
-            item.put("ProductCategory", new AttributeValue().withS("Book"));
+            item.put("productID", new AttributeValue().withN("002"));
+            item.put("productName", new AttributeValue().withS("HP Refurbished Sparkling Black 15.6 inch Pavilion TouchSmart 15-b129wm Laptop PC with AMD A6-4455M Accelerated Processor, 4GB Memory, Touchscreen, 500GB Hard Drive and Windows 8"));
+            item.put("productDescription", new AttributeValue().withS("HP believes in touch technology for everyone. That's why they took a great everyday laptop and gave it a touchscreen, which lets you make the most of Windows 8. With the refurbished Sparkling Black 15.6 HP Pavilion TouchSmart Laptop PC, 15-b129wm, you can scroll effortlessly through social networks, share photos with a few simple taps or start a Skype chat with a touch, all on a thin and light design you'll want with you all the time."));
+            item.put("productPrice", new AttributeValue().withN("363"));
+            item.put("quantity", new AttributeValue().withN("5"));
+            item.put("categoryID", new AttributeValue().withS("100"));
+            client.putItem(itemRequest);
+            item.clear();
+        	
+            item.put("productID", new AttributeValue().withN("003"));
+            item.put("productName", new AttributeValue().withS("Dell Sleekbook Carbon Fiber 12.5 inch XPS XPSU12-4671CRBFB Laptop PC with Intel Core i5-4200U Processor, 4GB Memory, Touchscreen, 128GB SSD and Windows 8.1 with Voice Assistant*"));
+            item.put("productDescription", new AttributeValue().withS("Dell Sleekbook Carbon Fiber 12.5inch XPS XPSU12-4671CRBFB Laptop PC with Intel Core i5-4200U Processor, 4GB Memory, Touchscreen, 128GB SSD and Windows 8.1 with Voice Assistant*"));
+            item.put("productPrice", new AttributeValue().withN("910"));
+            item.put("quantity", new AttributeValue().withN("15"));
+            item.put("categoryID", new AttributeValue().withS("100"));
+            client.putItem(itemRequest);
+            item.clear();*/
+            /*
+            item.put("productID", new AttributeValue().withN("004"));
+            item.put("productName", new AttributeValue().withS("Dell Pre-Owned, Refurbished GX755 Small Form Factor Desktop PC with Intel Core 2 Duo Processor, 4GB Memory, 750GB Hard Drive and Windows 7 Professional (Monitor Not Included)"));
+            item.put("productDescription", new AttributeValue().withS("The Dell Refurbished GX755 Small Form Factor Desktop PC has an Intel processor for the computing power you need. A 750GB hard drive gives you tons of room to store all of your multimedia files. A DVD-RW lets you watch movies, burn backup discs and more."));
+            item.put("productPrice", new AttributeValue().withN("210"));
+            item.put("quantity", new AttributeValue().withN("3"));
+            item.put("categoryID", new AttributeValue().withS("101"));
+            client.putItem(itemRequest);
+            item.clear();*/
+        	
+        	
+        	
+        	Map<String, AttributeValue> category = new HashMap<String, AttributeValue>();
+            PutItemRequest categoryRequest = new PutItemRequest().withTableName(tableName).withItem(category);
             
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
-            item.clear();
+            category.put("categoryID", new AttributeValue().withS("100"));
+            category.put("categoryName", new AttributeValue().withS("Laptops"));
+            category.put("catalogID", new AttributeValue().withS("1000"));
+            categoryRequest = new PutItemRequest().withTableName("category").withItem(category);
+            client.putItem(categoryRequest);
+            category.clear();
             
-            item.put("ProductID", new AttributeValue().withN("103"));
-            item.put("Title", new AttributeValue().withS("Book 103 Title"));
-            item.put("ISBN", new AttributeValue().withS("333-3333333333"));
-            item.put("Authors", new AttributeValue().withSS(Arrays.asList("Author1", "Author2")));
-            // Intentional. Later we run scan to find price error. Find items > 1000 in price.            
-            item.put("Price", new AttributeValue().withN("2000")); 
-            item.put("Dimensions", new AttributeValue().withS("8.5 x 11.0 x 1.5"));
-            item.put("PageCount", new AttributeValue().withN("600"));
-            item.put("InPublication", new AttributeValue().withN("0"));
-            item.put("ProductCategory", new AttributeValue().withS("Book"));
+            category.put("categoryID", new AttributeValue().withS("101"));
+            category.put("categoryName", new AttributeValue().withS("Desktops"));
+            category.put("catalogID", new AttributeValue().withS("1000"));
+            categoryRequest = new PutItemRequest().withTableName("category").withItem(category);
+            client.putItem(categoryRequest);
+            category.clear();
 
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
-            item.clear();
+            category.put("categoryID", new AttributeValue().withS("102"));
+            category.put("categoryName", new AttributeValue().withS("Softwares"));
+            category.put("catalogID", new AttributeValue().withS("1000"));
+            categoryRequest = new PutItemRequest().withTableName("category").withItem(category);
+            client.putItem(categoryRequest);
+            category.clear();
 
-            // Add bikes.
-            item.put("ProductID", new AttributeValue().withN("201"));
-            item.put("Title", new AttributeValue().withS("18-Bike-201")); // Size, followed by some title.
-            item.put("Description", new AttributeValue().withS("201 Description"));
-            item.put("BicycleType", new AttributeValue().withS("Road"));
-            item.put("Brand", new AttributeValue().withS("Mountain A")); // Trek, Specialized.
-            item.put("Price", new AttributeValue().withN("100"));
-            item.put("Gender", new AttributeValue().withS("M")); // Men's
-            item.put("Color", new AttributeValue().withSS(Arrays.asList("Red", "Black")));
-            item.put("ProductCategory", new AttributeValue().withS("Bicycle"));
+            category.put("categoryID", new AttributeValue().withS("103"));
+            category.put("categoryName", new AttributeValue().withS("Android"));
+            category.put("catalogID", new AttributeValue().withS("1001"));
+            categoryRequest = new PutItemRequest().withTableName("category").withItem(category);
+            client.putItem(categoryRequest);
 
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
-            item.clear();
-
-            item.put("ProductID", new AttributeValue().withN("202"));
-            item.put("Title", new AttributeValue().withS("21-Bike-202")); 
-            item.put("Description", new AttributeValue().withS("202 Description"));
-            item.put("BicycleType", new AttributeValue().withS("Road"));
-            item.put("Brand", new AttributeValue().withS("Brand-Company A"));
-            item.put("Price", new AttributeValue().withN("200"));
-            item.put("Gender", new AttributeValue().withS("M"));
-            item.put("Color", new AttributeValue().withSS(Arrays.asList("Green", "Black")));
-            item.put("ProductCategory", new AttributeValue().withS("Bicycle"));
+        	
+   
             
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
-            item.clear();
-
-            item.put("ProductID", new AttributeValue().withN("203"));
-            item.put("Title", new AttributeValue().withS("19-Bike-203")); 
-            item.put("Description", new AttributeValue().withS("203 Description"));
-            item.put("BicycleType", new AttributeValue().withS("Road"));
-            item.put("Brand", new AttributeValue().withS("Brand-Company B"));
-            item.put("Price", new AttributeValue().withN("300"));
-            item.put("Gender", new AttributeValue().withS("W")); // Women's
-            item.put("Color", new AttributeValue().withSS(Arrays.asList("Red", "Green", "Black")));
-            item.put("ProductCategory", new AttributeValue().withS("Bicycle"));
-
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
-            item.clear();
-
-            item.put("ProductID", new AttributeValue().withN("204"));
-            item.put("Title", new AttributeValue().withS("18-Bike-204")); 
-            item.put("Description", new AttributeValue().withS("204 Description"));
-            item.put("BicycleType", new AttributeValue().withS("Mountain"));
-            item.put("Brand", new AttributeValue().withS("Brand-Company B"));
-            item.put("Price", new AttributeValue().withN("400"));
-            item.put("Gender", new AttributeValue().withS("W"));
-            item.put("Color", new AttributeValue().withSS(Arrays.asList("Red")));
-            item.put("ProductCategory", new AttributeValue().withS("Bicycle"));
-
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
-            item.clear();
-
-            item.put("ProductID", new AttributeValue().withN("205"));
-            item.put("Title", new AttributeValue().withS("20-Bike-205")); 
-            item.put("Description", new AttributeValue().withS("205 Description"));
-            item.put("BicycleType", new AttributeValue().withS("Hybrid"));
-            item.put("Brand", new AttributeValue().withS("Brand-Company C"));
-            item.put("Price", new AttributeValue().withN("500"));
-            item.put("Gender", new AttributeValue().withS("B")); // Boy's
-            item.put("Color", new AttributeValue().withSS(Arrays.asList("Red", "Black")));
-            item.put("ProductCategory", new AttributeValue().withS("Bicycle"));
             
-            itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-            client.putItem(itemRequest);
+            
+/*
+           Map<String, AttributeValue> catalog = new HashMap<String, AttributeValue>();
+            PutItemRequest catalogRequest = new PutItemRequest().withTableName(tableName).withItem(catalog);
+            
+            catalog.put("catalogID", new AttributeValue().withS("1000"));
+            catalog.put("catalogName", new AttributeValue().withS("Computers"));
+            catalogRequest = new PutItemRequest().withTableName("catalog").withItem(catalog);
+            client.putItem(catalogRequest);
+            catalog.clear();
+            
+            catalog.put("catalogID", new AttributeValue().withS("1001"));
+            catalog.put("catalogName", new AttributeValue().withS("Cell Phones"));
+            catalogRequest = new PutItemRequest().withTableName("catalog").withItem(catalog);
+            client.putItem(catalogRequest);
+            catalog.clear();
+
+            catalog.put("catalogID", new AttributeValue().withS("1002"));
+            catalog.put("catalogName", new AttributeValue().withS("Cameras"));
+            catalogRequest = new PutItemRequest().withTableName("catalog").withItem(catalog);
+            client.putItem(catalogRequest);*/
+            
 
                 
         }   catch (AmazonServiceException ase) {
