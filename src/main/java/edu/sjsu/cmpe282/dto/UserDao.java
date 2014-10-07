@@ -505,6 +505,10 @@ public class UserDao {
 		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
 		String timestamp= getCurrentDateTime();
 		
+		/*
+		HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
+		key.put("emailID", new AttributeValue().withS(emailID));*/
+
 
 		  Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
 		  attributeList.put("emailID", new AttributeValue().withS(emailID));
@@ -524,19 +528,24 @@ public class UserDao {
 		HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
 		key.put("emailID", new AttributeValue().withN(emailID));*/
 		/*
-	*/	updateItems.put("emailID", new AttributeValueUpdate().withAction(AttributeAction.ADD)
-			.withValue(new AttributeValue().withS(emailID)));
-
-		updateItems.put("productID", new AttributeValueUpdate().withAction(AttributeAction.ADD)
-				.withValue(new AttributeValue().withS(productID)));
-
-
-		updateItems.put("quantity", new AttributeValueUpdate().withAction(AttributeAction.ADD)
-				.withValue(new AttributeValue().withS(quantity)));
+	*/	/*
+		  updateItems.put("emailID", new AttributeValueUpdate().withAction(AttributeAction.ADD)
+			.withValue(new AttributeValue().withS(emailID)));*/
+/*
+		updateItems.put("productID", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(productID)));*/
 
 
-		updateItems.put("timestamp", new AttributeValueUpdate().withAction(AttributeAction.ADD)
+		updateItems.put("quantity", 
+				  new AttributeValueUpdate()
+				    .withAction(AttributeAction.ADD)
+				    .withValue(new AttributeValue().withN("+"+quantity)));
+
+
+		updateItems.put("timestamp", new AttributeValueUpdate().withAction(AttributeAction.PUT)
 				.withValue(new AttributeValue().withS(timestamp)));
+		
+		
 
 		/*// Add two new authors to the list.
 		updateItems.put("Authors", 
@@ -559,7 +568,6 @@ public class UserDao {
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest()
 		.withTableName(tableName)
 		.withKey(attributeList)
-		.withReturnValues(ReturnValue.UPDATED_NEW)
 		.withAttributeUpdates(updateItems);
 
 		
@@ -592,7 +600,7 @@ public class UserDao {
 	//	new UserDao().updateCart("pooja@gmail.com", "001", "3");
 	//	new UserDao().updateCart("poornima@gmail.com", "002", "2");
 
-		new UserDao().updateCart("poorni@gmail.com", "002","2");
+		new UserDao().updateCart("poorni@gmail.com", "002","4");
 
 
 	}
