@@ -41,12 +41,29 @@ public class UserResource {
 		//return "rest operation";
 	}
 	
-	@GET
+	@POST
 	@Path("/getCatalog")
 	public String getCatalogs()
 	{
 		
 		return userdao.getCatalog();
+		
+	}
+	
+	@POST
+	@Path("/addCatalog")
+	public String addCatalog(String catalogDetails)
+	{
+		
+		return userdao.addCatalog(catalogDetails);
+		
+	}
+	@POST
+	@Path("/addProduct")
+	public String addProduct(String productDetails)
+	{
+		
+		return userdao.addProduct(productDetails);
 		
 	}
 	
@@ -66,4 +83,43 @@ public class UserResource {
 	
 		return userdao.getCategory(catalogID);
 	}
+	
+	@POST
+	@Path("/viewItemsInCart")
+	public String viewItemsInCart(String emailID)
+	{
+		
+		return userdao.viewItemsInCart(emailID);
+	}
+	@POST
+	@Path("/addToCart")
+	public String addToCart(String cartDetails)
+	{
+			
+		return userdao.updateCart(cartDetails);
+		
+	}
+	
+	@POST
+	@Path("/removeFromCart")
+	public String removeFromCart(String cartItem)
+	{
+			
+		return userdao.removeFromCart(cartItem);
+		
+	}
+	@POST
+	@Path("/addPayment")	
+	public String addOrderPayment(String orderDetails)
+	{
+		
+		return userdao.addOrderPayment(orderDetails);
+	}
+	@POST
+	@Path("/orderHistory")
+	public String orderHistory(String emailID){
+		
+		return userdao.orderHistory(emailID);
+	} 
+	
 }

@@ -100,6 +100,104 @@ function signOutFun(){
 
 </script>
 
+<script type="text/javascript">
+ function addCatalogFun()
+ {
+	 alert("button clicked");
+	 alert("Catalog to be added- "+ $('#catalogName').val())
+ jQuery.ajax({
+     type: "POST",
+     url: "http://localhost:8080/CloudServices/rest/users/addCatalog",
+    data: formToJSON(),
+     contentType: "application/json; charset=utf-8",
+     dataType: "json",
+     success: function (data, status, jqXHR) {
+     	
+     	if(JSON.stringify(data["statusCode"])== 200 )
+ 		{
+     	 	alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
+     	//	alert("data: \n"+ JSON.stringify(data["catalog"])); 
+     		//var jsonData = JSON.parse(JSON.stringify(data["catalog"]));
+     		//alert("Parse\n"+ jsonData);
+     	
+     /* 	for (var i = 0; i < jsonData.length; i++) {
+     		    var counter = jsonData[i];
+     		    console.log(counter.catalogName);
+     		    //alert("Product Name" + counter.productName+ "\t Quantity:"+ counter.quantity+"\t Product Price"+counter.productPrice)
+     	
+     		    newli = "<li class='catalogName' value="+counter.catalogID +">"+counter.catalogName+"</li>";
+     	        $('#catalogList').append(newli); 
+     		  
+     		
+     		}  */
+ 			
+ 			}
+ 		else
+ 			{
+ 			alert("Status Code: "+ JSON.stringify(data["statusCode"])+"\n Status Message:"+"Error in retreiving products");
+ 			
+ 			}
+ 				    },
+
+     error: function (jqXHR, status) {            
+     	alert(jqXHR+" "+status);
+     }
+
+ });
+ }
+ function formToJSON() {
+	    return JSON.stringify({
+	    "catalogName": $('#catalogName').val(),
+	    "catalogID": $('#catalogID').val(),
+	    });
+	}
+
+</script>
+<script type="text/javascript">
+ function addProductFun()
+ {
+	 alert("button clicked");
+	 alert("Catalog to be added- "+ $('#catalogName').val())
+ jQuery.ajax({
+     type: "POST",
+     url: "http://localhost:8080/CloudServices/rest/users/addProduct",
+    data: formToJSON1(),
+     contentType: "application/json; charset=utf-8",
+     dataType: "json",
+     success: function (data, status, jqXHR) {
+     	
+     	if(JSON.stringify(data["statusCode"])== 200 )
+ 		{
+     	 	alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
+     			
+ 			}
+ 		else
+ 			{
+ 			alert("Status Code: "+ JSON.stringify(data["statusCode"])+"\n Status Message:"+"Error in retreiving products");
+ 			
+ 			}
+ 				    },
+
+     error: function (jqXHR, status) {            
+     	alert(jqXHR+" "+status);
+     }
+
+ });
+ }
+ function formToJSON1() {
+	    return JSON.stringify({
+	    "productName": $('#productName').val(),
+	    "productID": $('#productID').val(),
+	    "productDescription": $('#productDescription').val(),
+	    "productPrice": $('#productPrice').val(),
+	    "quantity": $('#quantity').val(),
+	    "categoryID": $('#categoryID').val(),
+	    });
+	}
+
+</script>
+
+
 
 <!--end slider -->
 </head>
@@ -136,7 +234,7 @@ function signOutFun(){
 			<p>CmpE 282 - Cloud Services</p>
 		</div>
 		<!-- start header_right -->
-						<div >
+						
 
 
 					<div class="search">
@@ -147,18 +245,10 @@ function signOutFun(){
 		
 					</div>
 					
-						
-								<div class="cart" >
-									
-					<a href="orderHistory.html" ><h5><b>Order History</b> </h5></a>
-					
-				<a href="cartItems.html"> <img src="assets/img/cart.jpg"
-								height="70" width="70" title="View items in Cart" alt="" /></a>
-</div>	
-				</div>
+				
 		<!-- start header menu -->
 		<ul class="megamenu skyblue" id ="catalogList">
-			<li><a class="color1" href="index1.html">Home</a></li>
+			<li><a class="color1" href="index.html">Home</a></li>
 			<li class="grid"><a class="color2" href="#">Computers</a>
 				<div class="megapanel">
 					<div class="row">
@@ -254,54 +344,124 @@ function signOutFun(){
 	</div>
 </div>
 </div>
-<!-- content -->
 <div class="container">
-<div class="main">			
-	<!-- start content -->
-	<div class="content">
-		<div class="content_text">
-			<h3>Today's Trends</h3>
+<div class="main">
+	<!-- start registration -->
+	<div class="registration">
+		<div class="registration_left">
+		<h3> Add Catalog</h3>
+		
+		<script>
+			(function() {
+		
+			// Create input element for testing
+			var inputs = document.createElement('input');
 			
-			<!-- <p>Online Shopping Stores</p> -->
-		</div>
-		<!-- grids_of_3 -->
-		<div class="row grids">
-			<div class="col-md-3 grid1">
-			  <a href="details.html">
-				<img src="assets/img/pic1.jpg" class="img-responsive" alt=""/>
-				<div class="look">			
-					<p>read more</p>
-				</div></a>
-			</div>
-			<div class="col-md-3 grid1">
-			  <a href="details.html">
-				<img src="assets/img/pic2.jpg" class="img-responsive" alt=""/>
-				<div class="look">			
+			// Create the supports object
+			var supports = {};
+			
+			supports.autofocus   = 'autofocus' in inputs;
+			supports.required    = 'required' in inputs;
+			supports.placeholder = 'placeholder' in inputs;
+		
+			// Fallback for autofocus attribute
+			if(!supports.autofocus) {
+				
+			}
+			
+			// Fallback for required attribute
+			if(!supports.required) {
+				
+			}
+		
+			// Fallback for placeholder attribute
+			if(!supports.placeholder) {
+				
+			}
+			
+			// Change text inside send button on submit
+			var send = document.getElementById('register-submit');
+			if(send) {
+				send.onclick = function () {
+					this.innerHTML = '...Sending';
+				}
+			}
+		
+		})();
+		</script>
+		 <div class="registration_form">
+		 <!-- Form -->
+			<form id="registration_form" onsubmit="return false;">
+			<div>
+					<label>
+						<input id="catalogID" placeholder="Catalog ID" type="text" tabindex="1" required autofocus>
+					</label>
+				</div>
+				<div>
+					<label>
+						<input id="catalogName" placeholder="Catalog Name" type="text" tabindex="2" required autofocus>
+					</label>
+				</div>
 					
-					<p>read more</p>
-				</div></a>
-			</div>
-			<div class="col-md-3 grid1">
-			  <a href="details.html">
-				<img src="assets/img/pic3.jpg" class="img-responsive" alt=""/>
-				<div class="look">			
-					
-					<p>read more</p>
-				</div></a>
-			</div>
-			<div class="col-md-3 grid1">
-			  <a href="details.html">
-				<img src="assets/img/pic4.jpg" class="img-responsive" alt=""/>
-				<div class="look">			
-					<h4>get scraves</h4>
-					<p>read more</p>
-				</div></a>
-			</div>
+				<button class="btn btn-primary" id="addCatalog" onclick="addCatalogFun()">Submit</button>
+					<input type="reset" class="btn btn-primary" id="clear">
+							</form>
+			<!-- /Form -->
+			
 		</div>
-		<!-- end grids_of_3 -->
 	</div>
-	<!-- end content -->
+	<div class="registration_left">
+		<h2>Add Product</h2>
+		
+		 <div class="registration_form">
+		 <!-- Form -->
+			<form id="registration_form" onsubmit="return false;">
+				<div>
+					<label>
+						<input id="productID" placeholder="Product ID" type="text" tabindex="3" required>
+					</label>
+				</div>
+				<div>
+					<label>
+						<input id="productName" placeholder="Product Name" type="text" tabindex="4" required>
+					</label>
+				</div>	
+				<div>
+					<label>
+						<input id="productDescription" placeholder="Product Description" type="text" tabindex="5" required>
+					</label>
+				</div>	
+				<div>
+					<label>
+						<input id="productPrice" placeholder="Product Price" type="text" tabindex="6" required>
+					</label>
+				</div>	
+				<div>
+					<label>
+						<input id="quantity" placeholder="Quantity" type="text" tabindex="7" required>
+					</label>
+				</div>	
+				<div>
+					<label>
+						<input id="categoryID" placeholder="Category ID" type="text" tabindex="4" required>
+					</label>
+				</div>							
+				<div>
+				<button class="btn btn-primary" id="addProduct" onclick="addProductFun()">Submit</button>
+					<!-- <input type="submit" value="sign in" id="register-submit"> -->
+				<input type="reset" class="btn btn-primary" id="clear">
+				</div>
+				
+			</form>
+			<!-- /Form -->
+			</div>
+	</div>
+	<div class="clearfix"></div>
+	</div>
+	<!-- end registration -->
 </div>
+</div>
+
 </div>
 
 <!-- footer -->

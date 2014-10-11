@@ -223,13 +223,24 @@ input:focus {
 .header_right{
 	margin: 2% 0;
 }
+
+
+/*Cart*/
+.cart{
+align:right;
+		
+	margin-left: 90%;
+		
+	
+}
+
 /*search*/
 .search{
 	float:right;
 	position: relative;
 	background: #f3f4f5;
 	border: 1px solid #D8D8D8;
-	margin-right: 3%;
+	margin-right: 20%;
 	width: 24.33333%;
 }
 .search form{

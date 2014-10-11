@@ -23,13 +23,16 @@
 <script src="assets/js/menu_jquery.js"></script>
 
 <script src="assets/js/signUp.js"></script>
-
+<script src="assets/js/jquery.cookie.js"></script>
 	<script type="text/javascript">
 	
 function LogInfun(){
 
 	var URL = "http://localhost:8080/CloudServices/rest/users/signin";
+	
 	alert("signin button clicked"+ "\t Object:"+ formToJSON1() );//+formToJSON());
+		
+	alert(formToJSON1());
 	
 	$.ajax({
 			type: "POST",
@@ -43,9 +46,16 @@ function LogInfun(){
 					//alert("Success:\t " + JSON.stringify(data["statusCode"])+"\t StatusMessage"+ JSON.stringify(data["statusMessage"]));
 					
 					if(JSON.stringify(data["statusCode"])== 200 )
-					{
-						window.location.href = "home.html?firstName="+JSON.stringify(data["firstName"])+"&lastLoginTime="+JSON.stringify(data["lastLoginTime"]);
-						}
+					{ 
+						$.cookie("email",JSON.stringify(data["email"]));
+						$.cookie("firstName",JSON.stringify(data["firstName"]));
+						$.cookie("lastLoginTime",JSON.stringify(data["lastLoginTime"]));
+						alert(JSON.stringify(data["email"]));
+						//window.location.href = "home.html?firstName="+JSON.stringify(data["firstName"])+"&lastLoginTime="+JSON.stringify(data["lastLoginTime"]);
+					window.location.href="home.html";
+					
+					
+					}
 					else
 						{
 						alert("Status Code: "+ JSON.stringify(data["statusCode"])+"\n Status Message:"+ JSON.stringify(data["statusMessage"])+"\n Please enter your username and password correctly!");
@@ -89,6 +99,9 @@ function formToJSON1() {
 				{
 		    		alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"])+"\n User created successfully" );
 					window.location.href = "home.html";
+					$.cookie("email",JSON.stringify(data["email"]));
+					$.cookie("firstName",JSON.stringify(data["firstName"]));
+					//$.cookie("lastLoginTime",JSON.stringify(data["lastLoginTime"]));
 					}
 				else
 					{
@@ -113,7 +126,15 @@ function formToJSON1() {
 		    });
 		}
 	</script>
+<script type="text/javascript">
+function signOutFun(){
+	
+	$.removeCookie("email"); 
+	$.removeCookie("firstName"); 
+	$.removeCookie("lastLoginTime"); 
 
+}
+</script>
 </head>
 
 
@@ -156,81 +177,7 @@ function formToJSON1() {
 		</div>
 		<div class="clearfix"></div>
 		</div>
-		<!-- start header menu -->
-		<!-- <ul class="megamenu skyblue">
-			<li><a class="color1" href="index1.html">Home</a></li>
-			<li class="grid"><a class="color2" href="#">Electronics</a>
-				<div class="megapanel">
-					<div class="row">
-						<div class="col1">
-							<div class="h_nav">
-								<h4>shop</h4>
-								<ul>
-									<li><a href="women.html">Laptops</a></li>
-									<li><a href="women.html">Mobiles</a></li>
-									<li><a href="women.html">cameras</a></li>
-									
-								</ul>	
-							</div>							
-						</div>
-					
-					</div>
-					
-    				</div>
-				</li>
-			<li class="active grid"><a class="color4" href="#">Fashion</a>
-				<div class="megapanel">
-					<div class="row">
-						<div class="col1">
-							<div class="h_nav">
-								<h4>shop</h4>
-								<ul>
-								<li><a href="items.html">new arrivals</a></li>
-									<li><a href="items.html">men</a></li>
-									<li><a href="items.html">women</a></li>
-									<li><a href="items.html">accessories</a></li>
-									<li><a href="items.html">kids</a></li>
-									<li><a href="items.html">brands</a></li>
-								</ul>	
-							</div>							
-						</div>
-				
-					</div>
-					<div class="row">
-						<div class="col2"></div>
-						<div class="col1"></div>
-						<div class="col1"></div>
-						<div class="col1"></div>
-						<div class="col1"></div>
-					</div>
-    				</div>
-				</li>				
-	
 
-
-				<li><a class="color10" href="contact.html">Contact</a>
-					<div class="megapanel">
-						<div class="row">
-							<div class="col3">
-								<div class="h_nav">
-									<h4>contact us</h4>
-								</div>
-								<form class="contact">
-									<label for="name">Name</label>
-									<input id="name" type="text"/>
-									<label for="email">E-mail</label>
-									<input id="email" type="text"/>
-									<label for="message">Message</label>
-									<textarea rows="8" id="message"></textarea>
-									<input type="submit" value="Send"/>
-								</form>
-							</div>
-							<div class="col3">
-							</div>
-						</div>
-					</div>
-				</li>
-		 </ul>  -->
     </div>
 </div>
 </div>

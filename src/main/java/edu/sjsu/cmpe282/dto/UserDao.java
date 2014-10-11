@@ -176,17 +176,6 @@ public class UserDao {
 
 	}
 
-
-
-	public String getCatalogs()
-	{
-
-		return "";
-
-
-	}
-
-
 	public String getProductByID(String productID)
 	{
 		awsAuthentication();
@@ -314,9 +303,10 @@ public class UserDao {
 				String key =  (String) i.next();
 				String value = item.get(key).toString();
 				String actualValue = (value.substring(3,(value.length())-2));
-				p.put(key, actualValue);
+				p.put(key, actualValue.trim());
 			}
 			array.put(p);
+			//	System.out.println("ITEM:"+ item);
 		}
 		return array;
 
@@ -329,12 +319,12 @@ public class UserDao {
 		JSONObject response = new JSONObject();
 		try{
 			awsAuthentication();
-			JSONArray product = new JSONArray();
-			product = getCatalogfromDynamoDB();
+			JSONArray catalog = new JSONArray();
+			catalog = getCatalogfromDynamoDB();
 
 			response.put("statusCode",STATUS_SUCCESS_CODE);
 			response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
-			response.put("catalog",product);
+			response.put("catalog",catalog);
 
 			System.out.println("response "+ response.toString());
 		}
@@ -436,6 +426,7 @@ public class UserDao {
 				String actualValue = (value.substring(3,(value.length())-2));
 				p.put(key, actualValue);
 			}
+
 			array.put(p);
 		}
 		return array;
@@ -467,23 +458,26 @@ public class UserDao {
 
 	}
 
-	public String removeFromCart(String emailID,String productID)
+	public String removeFromCart(String cartItem)
 	{
 		awsAuthentication();
 
+		JSONObject cItem = new JSONObject(cartItem);
+		String emailID= cItem.get("emailID").toString();
+		String productID= cItem.get("productID").toString();
 		String tableName = "cart";
 		JSONObject response = new JSONObject();
 
-		  Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
-		  attributeList.put("emailID", new AttributeValue().withS(emailID));
-		  attributeList.put("productID", new AttributeValue().withS(productID));
-		  
-		        for (Map.Entry<String, AttributeValue> item : attributeList.entrySet()) {
-		            String attributeName = item.getKey();
-		            AttributeValue value = item.getValue();
-		            System.out.println("AttributeName"+ attributeName+"\t value "+value);
-		        }
-		        
+		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
+		attributeList.put("emailID", new AttributeValue().withS(emailID));
+		attributeList.put("productID", new AttributeValue().withS(productID));
+
+		for (Map.Entry<String, AttributeValue> item : attributeList.entrySet()) {
+			String attributeName = item.getKey();
+			AttributeValue value = item.getValue();
+			System.out.println("AttributeName"+ attributeName+"\t value "+value);
+		}
+
 
 		DeleteItemRequest deleteItemRequest = new DeleteItemRequest()
 		.withTableName(tableName).withKey(attributeList);
@@ -498,88 +492,408 @@ public class UserDao {
 		return response.toString();
 	}
 
-	public String updateCart(String emailID, String productID,String quantity )
+	public String updateCart(String cartDetails)
 	{
+
+		System.out.println("CART DETAILS : "+ cartDetails);
+		JSONObject cart =  new JSONObject(  cartDetails);
+
+		int emailIDLength = cart.get("emailID").toString().length();
+		String emailID = cart.get("emailID").toString().substring(1,emailIDLength-1);
+		String productID =  cart.get("productID").toString();
+		String quantity="3";  // cart.get("productQuantity").toString();
+		String productName = cart.get("productName").toString() ;
+		String productPrice = cart.get("productPrice").toString();
+
+
+		JSONObject response = new JSONObject();
+
 		awsAuthentication();
 		String tableName = "cart";
 		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
 		String timestamp= getCurrentDateTime();
-		
-		/*
-		HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
-		key.put("emailID", new AttributeValue().withS(emailID));*/
 
 
-		  Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
-		  attributeList.put("emailID", new AttributeValue().withS(emailID));
-		  attributeList.put("productID", new AttributeValue().withS(productID));
 
-/*		Map<String, Condition> keyConditions = new HashMap<String, Condition>();
+		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
+		attributeList.put("emailID", new AttributeValue().withS(emailID));
+		attributeList.put("productID", new AttributeValue().withS(productID));
 
-		Condition hashKeyCondition = new Condition()
-		.withAttributeValueList(new AttributeValue().withS(emailID));
-		keyConditions.put("emailID", hashKeyCondition);
-
-		Condition rangeKeyCondition = new Condition()
-		.withAttributeValueList(new AttributeValue().withS(productID));
-		keyConditions.put("productID", rangeKeyCondition);*/
-
-/*
-		HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
-		key.put("emailID", new AttributeValue().withN(emailID));*/
-		/*
-	*/	/*
-		  updateItems.put("emailID", new AttributeValueUpdate().withAction(AttributeAction.ADD)
-			.withValue(new AttributeValue().withS(emailID)));*/
-/*
-		updateItems.put("productID", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(productID)));*/
 
 
 		updateItems.put("quantity", 
-				  new AttributeValueUpdate()
-				    .withAction(AttributeAction.ADD)
-				    .withValue(new AttributeValue().withN("+"+quantity)));
+				new AttributeValueUpdate()
+		.withAction(AttributeAction.ADD)
+		.withValue(new AttributeValue().withN("+"+quantity)));
 
+		updateItems.put("productName", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(productName)));
 
 		updateItems.put("timestamp", new AttributeValueUpdate().withAction(AttributeAction.PUT)
 				.withValue(new AttributeValue().withS(timestamp)));
-		
-		
+		updateItems.put("productPrice", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(productPrice)));
 
-		/*// Add two new authors to the list.
-		updateItems.put("Authors", 
-		  new AttributeValueUpdate()
-		    .withAction(AttributeAction.ADD)
-		    .withValue(new AttributeValue().withSS("AuthorYY", "AuthorZZ")));*/
-		/*
-		// Reduce the price. To add or subtract a value,
-		// use ADD with a positive or negative number.
-		updateItems.put("Price", 
-		  new AttributeValueUpdate()
-		    .withAction(AttributeAction.ADD)
-		    .withValue(new AttributeValue().withN("-1")));
-
-		// Delete the ISBN attribute.
-		updateItems.put("ISBN", 
-		  new AttributeValueUpdate()
-		    .withAction(AttributeAction.DELETE));*/
 
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest()
 		.withTableName(tableName)
 		.withKey(attributeList)
 		.withAttributeUpdates(updateItems);
 
-		
-		
+
+
 		UpdateItemResult result = client.updateItem(updateItemRequest);
-		System.out.println("Result of update operation : " +result);
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+		return response.toString();
 
-		return"";
+	}
 
+	public String viewItemsInCart (String emailID)
+	{
+		JSONObject response = new JSONObject();
+
+		awsAuthentication();
+
+
+		// can do it in this method also......
+		/*		 HashMap<String, Condition> filter = new HashMap<String, Condition>();
+
+		 Condition hashKeyCondition = new Condition().withComparisonOperator(
+		 ComparisonOperator.EQ.toString()).withAttributeValueList(new AttributeValue().withS(emailID));
+
+		 filter.put("emailID", hashKeyCondition);
+
+		 QueryRequest queryRequest = new QueryRequest().withTableName("cart").withKeyConditions(filter);
+
+		 QueryResult result = client.query(queryRequest);
+		 System.out.println("Query Result:" + result);*/
+
+		System.out.println("---------------------------------------------");
+
+
+		HashMap<String, Condition> scanFilter = new HashMap<String, Condition>();
+
+
+
+		Condition hashKeyCondition1 = new Condition().withComparisonOperator(
+				ComparisonOperator.EQ.toString()).withAttributeValueList(new AttributeValue().withS(emailID));
+
+		scanFilter.put("emailID",hashKeyCondition1 );
+		ScanRequest scanRequest = new ScanRequest("cart").withScanFilter(scanFilter);
+		ScanResult scanResult = client.scan(scanRequest);
+		List<Map<String, AttributeValue>> items = scanResult.getItems();
+		JSONObject cartItems = new JSONObject();
+		JSONArray array = new JSONArray();
+
+		for (Map<?, ?> item : items) {
+			Set s = item.keySet();  
+			Iterator i  = s.iterator(); 
+			JSONObject p = new JSONObject();
+
+			while(i.hasNext()) {
+
+				String key =  (String) i.next();
+				String value = item.get(key).toString();
+				String actualValue = (value.substring(3,(value.length())-2));
+				p.put(key, actualValue);
+			}
+			array.put(p);
+			//System.out.println(p);
+		}
+		cartItems.put("items", array);
+		//	System.out.println(cartItems.toString());
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+		response.put("cartItems", cartItems);
+		System.out.println(response.toString());
+		return response.toString();
+
+	}
+
+
+
+	public String mainMenuLoad()
+	{
+		JSONObject response = new JSONObject();
+
+		awsAuthentication();
+		/*		
+		String tableName_CATALOG = "catalog";
+
+		JSONObject catalogName = new JSONObject();
+
+		ScanRequest scanRequest = new ScanRequest(tableName_CATALOG);
+		ScanResult scanResult = client.scan(scanRequest);
+
+
+		List<Map<String, AttributeValue>> items = scanResult.getItems();
+		int n=1;
+		JSONArray array = new JSONArray();
+		for (Map<?, ?> item : items) {
+
+String cName = item.get("catalogName").toString();
+String actualcName = (cName.substring(3,(cName.length())-2));
+System.out.println(actualcName);
+String cID = item.get("catalogID").toString();
+String actualcID= (cID.substring(3,(cID.length())-2));
+System.out.println(actualcID);
+System.out.println(getCategoryfromDynamoDB(actualcID.toString()));
+System.out.println("------------------------");
+		}*/
+
+
+		System.out.println(getCategoryfromDynamoDB("1000"));
+
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+
+		return response.toString();	
+
+	}
+
+	public String addOrderPayment(String emailID){
+
+		JSONObject response = new JSONObject();
+
+		String items = viewItemsInCart(emailID);
+		JSONObject obj = new JSONObject(items);
+		JSONObject c = (JSONObject) obj.get("cartItems");
+		JSONArray array = (JSONArray) c.get("items");
+
+		int i;
+		try {
+
+			for (i = 0; i < array.length(); i++) {
+
+				JSONObject item = array.getJSONObject(i);
+				String productID = item.get("productID").toString().trim() ;	
+				int quantity = Integer.parseInt(item.get("quantity").toString().trim()) ;
+				int totalPrice = Integer.parseInt(item.get("productPrice").toString().trim())*quantity;
+				String dop = getCurrentDateTime();
+				stmt = conn.createStatement();
+				String query = "INSERT INTO `cloudservices`.`orderPayments` (`emailID`, `productID`, `productName`, `productQuantity`,`productPrice`,`DOP`) VALUES ('" + emailID + "', '" + productID+ "', '" +item.get("productName").toString() + "', '" + quantity+ "','"+ totalPrice+"','"+dop+"');";
+				stmt.executeUpdate(query);
+
+				/*     Remove from cart         */
+				String removeItemStatus = removeFromCartAfterOrder(emailID, productID);
+			//	String  deductStatus=  deductProductQuantity(productID,quantity);
+				System.out.println("Remove Item Status "+removeItemStatus);
+		//	System.out.println("deduct Quantity Status"+ deductStatus);
+			}
+
+			response.put("statusCode",STATUS_SUCCESS_CODE);
+			response.put("statusMessage", STATUS_SUCCESS_MESSAGE+ i+"order placed");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			response.put("statusCode",STATUS_ERROR_CODE);
+			response.put("statusMessage", STATUS_ERROR_MESSAGE);
+			return response.toString();
+		}
+		catch(NumberFormatException ex){
+			ex.printStackTrace();
+			response.put("statusCode",STATUS_ERROR_CODE);
+			response.put("statusMessage", STATUS_ERROR_MESSAGE);
+			return response.toString();
+
+		}
+
+
+		//System.out.println(response.toString());
+		return response.toString();
+	}
+
+
+
+	public String removeFromCartAfterOrder(String emailID, String productID)
+	{
+		awsAuthentication();
+
+		String tableName = "cart";
+		JSONObject response = new JSONObject();
+
+		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
+		attributeList.put("emailID", new AttributeValue().withS(emailID));
+		attributeList.put("productID", new AttributeValue().withS(productID));
+
+		for (Map.Entry<String, AttributeValue> item : attributeList.entrySet()) {
+			String attributeName = item.getKey();
+			AttributeValue value = item.getValue();
+			System.out.println("AttributeName"+ attributeName+"\t value "+value);
+		}
+
+
+		DeleteItemRequest deleteItemRequest = new DeleteItemRequest()
+		.withTableName(tableName).withKey(attributeList);
+
+		DeleteItemResult deleteItemResult = client.deleteItem(deleteItemRequest);
+		System.out.println("DELETE ITEM RESULT"+ deleteItemResult);
+
+
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE + "Product removed from cart");
+
+		return response.toString();
 	}
 	
 	
+	public String deductProductQuantity(String productID, int quantity)
+	{
+
+		JSONObject response = new JSONObject();
+
+		awsAuthentication();
+		String tableName = "products";
+		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
+		//String timestamp= getCurrentDateTime();
+
+
+
+		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
+	//	attributeList.put("emailID", new AttributeValue().withS(emailID));
+		attributeList.put("productID", new AttributeValue().withS(productID));
+
+
+
+		updateItems.put("quantity", 
+				new AttributeValueUpdate()
+		.withAction(AttributeAction.ADD)
+		.withValue(new AttributeValue().withN("-"+quantity)));
+
+	/*	updateItems.put("productName", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(productName)));
+
+		updateItems.put("timestamp", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(timestamp)));
+		updateItems.put("productPrice", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(productPrice)));*/
+
+
+		UpdateItemRequest updateItemRequest = new UpdateItemRequest()
+		.withTableName(tableName)
+		.withKey(attributeList)
+		.withAttributeUpdates(updateItems);
+
+
+
+		UpdateItemResult result = client.updateItem(updateItemRequest);
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+		return response.toString();
+
+	}
+
+	public String orderHistory(String emailID)
+	{
+		JSONObject response = new JSONObject();
+		ResultSet rs;
+
+		try {
+			stmt = conn.createStatement();
+			String query = "Select * from cloudservices.orderPayments where emailID = '"+emailID+"';";
+			rs = stmt.executeQuery(query);
+			JSONArray array = new JSONArray();
+
+			while(rs.next()){
+				JSONObject obj = new JSONObject();
+				System.out.println(rs.getString("orderID"));
+
+				obj.put("orderID", rs.getString("orderID"));
+				obj.put("productID", rs.getString("productID"));
+				obj.put("productName", rs.getString("productName"));
+				obj.put("productQuantity", rs.getInt("productQuantity"));
+				obj.put("productPrice", rs.getInt("productPrice"));
+				obj.put("dop", rs.getString("dop"));
+				/*orderID = rs.getString("orderID");
+	productID =  rs.getString("productID");
+	productName =  rs.getString("productName");
+	productQuantity =  rs.getInt("productQuantity");
+	productPrice = rs.getInt("productPrice");
+	dop =rs.getString("dop");*/
+
+				array.put(obj);
+			}
+			System.out.println("JSON ARRAY:"+ array.toString());
+
+			response.put("orders", array);
+			response.put("statusCode",STATUS_SUCCESS_CODE);
+			response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			response.put("statusCode",STATUS_ERROR_CODE);
+			response.put("statusMessage", STATUS_ERROR_MESSAGE);
+			return response.toString();
+		}
+
+
+
+
+		return response.toString();
+
+
+
+	}
+
+	public String addCatalog(String catalogDetails)
+	{
+		JSONObject catalogs = new JSONObject(catalogDetails);
+
+		String catalogName= catalogs.get("catalogName").toString();
+		String catalogID = catalogs.get("catalogID").toString();
+
+		JSONObject response = new JSONObject();
+		awsAuthentication();
+		String tableName = "catalog" ;
+		Map<String, AttributeValue> catalog = new HashMap<String, AttributeValue>();
+		PutItemRequest catalogRequest = new PutItemRequest().withTableName(tableName).withItem(catalog);
+
+		catalog.put("catalogID", new AttributeValue().withS(catalogID));
+		catalog.put("catalogName", new AttributeValue().withS(catalogName));
+		catalogRequest = new PutItemRequest().withTableName("catalog").withItem(catalog);
+		client.putItem(catalogRequest);
+
+
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+		return response.toString();
+
+
+
+
+	}
+
+
+	public String addProduct(String productDeatils)
+	{
+
+		JSONObject product = new JSONObject(productDeatils);
+		JSONObject response = new JSONObject();
+		awsAuthentication();
+		String tableName = "products";
+
+		Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
+
+		PutItemRequest itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
+
+		item.put("productID", new AttributeValue().withN( product.get("productID").toString()));
+		item.put("productName", new AttributeValue().withS(product.get("productName").toString()));
+		item.put("productDescription", new AttributeValue().withS(product.get("productDescription").toString()));
+		item.put("productPrice", new AttributeValue().withN(product.get("productPrice").toString()));
+		item.put("quantity", new AttributeValue().withN(product.get("quantity").toString()));
+		item.put("categoryID", new AttributeValue().withS(product.get("categoryID").toString()));
+
+		client.putItem(itemRequest);
+
+
+		response.put("statusCode",STATUS_SUCCESS_CODE);
+		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+		return response.toString();
+
+	}
 
 	public static void main(String[] args)
 	{
@@ -592,17 +906,20 @@ public class UserDao {
 		//new UserDao().getProducts("100");
 		// new UserDao().getCategory("1001");
 		//	
-	//	new UserDao().addToCart("poornima@gmail.com", "003","1");
-	//	new UserDao().addToCart("pooja@gmail.com", "002", "2");
+		//	new UserDao().addToCart("poornima@gmail.com", "003","1");
+		//	new UserDao().addToCart("pooja@gmail.com", "002", "2");
 		// new UserDao().addToCart("poornima@gmail.com", "003","3");
 		//new UserDao().getProductByID("001");
 		// new UserDao().removeFromCart("pooja@gmail.com", "002");
-	//	new UserDao().updateCart("pooja@gmail.com", "001", "3");
-	//	new UserDao().updateCart("poornima@gmail.com", "002", "2");
+		//	new UserDao().updateCart("pooja@gmail.com", "001", "3");
+		//	new UserDao().updateCart("poornima@gmail.com", "002", "2");
 
-		new UserDao().updateCart("poorni@gmail.com", "002","4");
+		//new UserDao().updateCart("poorni@gmail.com", "003","1");
 
-
+		//new UserDao().mainMenuLoad();
+		//new UserDao().viewItemsInCart("pooja@gmail.com");
+		//new UserDao().addOrderPayment("pooja@gmail.com");
+		new UserDao().orderHistory("pooja@gmail.com");
 	}
 
 }

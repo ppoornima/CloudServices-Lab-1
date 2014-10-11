@@ -21,7 +21,6 @@
 <link href="assets/css/megamenu.css" rel="stylesheet" type="text/css"
 	media="all" />
 <script type="text/javascript" src="assets/js/megamenu.js"></script>
-<script src="assets/js/jquery.cookie.js"></script>
 <script>
 	$(document).ready(function() {
 		$(".megamenu").megamenu();
@@ -34,16 +33,17 @@
 <script src="assets/js/menu_jquery.js"></script>
 <!--end slider -->
 
+<script src="assets/js/jquery.cookie.js"></script>
 <script type="text/javascript">
 
 var email = $.cookie("email");
 var firstName= $.cookie("firstName") ;
 var lastLoginTime = $.cookie("lastLoginTime");
 
-console.log("Value obtained from cookie First Name : "+ firstName );
+/* console.log("Value obtained from cookie First Name : "+ firstName );
 console.log("Value obtained from cookie Email : "+ email );
 console.log("Value obtained from cookie lastLoginTime : "+ lastLoginTime );
-
+ */
 
 $(document).ready(function(){
 		
@@ -60,6 +60,7 @@ function signOutFun(){
 	$.removeCookie("email"); 
 	$.removeCookie("firstName"); 
 	$.removeCookie("lastLoginTime"); 
+
 }
 </script>
 
@@ -68,33 +69,38 @@ function signOutFun(){
 	var queryString = window.location.search;
 	queryString = queryString.substring(1);
 	id = queryString.split("=")[1];
-	var email = $.cookie("email");
+	
+
 	function loadAjaxTable() {
 
 		// AJAX call to get all products from server end on page load
-
+var email = $.cookie("email");
+var emailID= email.replace(/["]+/g,'');
 		jQuery
 				.ajax({
 					type : "POST",
-					url : "http://localhost:8080/CloudServices/rest/users/getProducts",
-					data : id,
+					url : "http://localhost:8080/CloudServices/rest/users/orderHistory",
+					data : emailID,
 					contentType : "application/json; charset=utf-8",
 					dataType : "json",
 					success : function(data, status, jqXHR) {
 
 						if (JSON.stringify(data["statusCode"]) == 200) {
-							/* 	alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
-								alert("data: \n"+ JSON.stringify(data["dataProducts"])); */
-							var jsonData = JSON.parse(JSON
-									.stringify(data["dataProducts"]));
-							//alert("Parse\n"+ jsonData);
+							alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
+							alert("data: \n"+ JSON.stringify(data["orders"])); 
+						var jsonData = JSON.parse(JSON
+									.stringify(data["orders"]));
+						//var jsonDataItems = jsonData["items"];
+						
+						alert("length"+ jsonData.length);
+							//alert("Parse\n"+ JSON.stringify(jsonDataItems["items"]));
 
-							for (var i = 0; i < jsonData.length; i++) {
+						for (var i = 0; i < jsonData.length; i++) {
 								var counter = jsonData[i];
-								console.log(counter.productName);
-								//alert("Product Name" + counter.productName+ "\t Quantity:"+ counter.quantity+"\t Product Price"+counter.productPrice)
-								var quantity = counter.quantity;
-								newRow = "<tr>"
+								console.log(counter.emailID);
+							alert("EMAIL ID:"+ JSON.stringify(counter.emailID)+"\t product ID:"+ JSON.stringify(counter.productID));
+							 
+								 newRow = "<tr>"
 										+ "<td id='productID_"+counter.productID+"' class='productID'>"
 										+ counter.productID
 										+ "</td>"
@@ -104,34 +110,23 @@ function signOutFun(){
 										+ "<td id='productPrice_"+counter.productID+"' class='productPrice'>"
 										+ counter.productPrice
 										+ "</td>"
-										+ "<td id='productDescription_"+counter.productID+"' class='productDescription'>"
-										+ counter.productDescription
-										+ "</td>"
 										+ "<td id='productQuantity_"+counter.productID+"' class='quantity'>"
-									 	 +"<select>";
-									 	 
-									 	
-									 	var options ="";
-										for(var j= 1;j<=quantity;j++)
-											{
-										 options = options + "<option value="+j+">"+j+"</option>";
-											}
-										
-										newRow += options +"</select>" 
-										
-									
+										+ counter.productQuantity
 										+ "</td>"
-										+ "<td class='addToCartBtn'> <button id='cartBtn_"+counter.productID+"' class='btn btn-primary' onclick='addToCart("+counter.productID+")'> Add to Cart </button> </td>"
+										+ "<td id='dop_"+counter.productID+"' class='quantity'>"
+										+ counter.dop
+										+ "</td>"
 										+ "</tr>";
-								$('#example > tbody > tr:last').after(newRow);
+										
+								$('#example > tbody > tr:last').after(newRow);  
 
-							}
+						}
 
 						} else {
 							alert("Status Code: "
 									+ JSON.stringify(data["statusCode"])
 									+ "\n Status Message:"
-									+ "Error in retreiving products");
+									+ "Error in retreiving Cart Items");
 
 						}
 					},
@@ -143,39 +138,32 @@ function signOutFun(){
 				});
 	}
 </script>
+<script>
 
-<script type="text/javascript">
-
-function addToCart(productID)
+function removeFromCartFun(productID)
 {
-	
-	var productName = $("#productName_"+productID).text(); //,var productPrice,var quantity, var emailID 
-	var quantity = $("#productQuantityS_"+productID).text();
-//	alert("quantity:"+ quantity);
-	
-	alert(productName);
-var requestData = formToJSON(productID);
-alert(requestData);
+	alert("PRODUCT ID :"+ productID);
+	var cartData= formToJSON(productID);
 	jQuery
 	.ajax({
 		type : "POST",
-		url : "http://localhost:8080/CloudServices/rest/users/addToCart",
-		data : requestData,
+		url : "http://localhost:8080/CloudServices/rest/users/orderHistory",
+		data : cartData,
 		contentType : "application/json; charset=utf-8",
 		dataType : "json",
 		success : function(data, status, jqXHR) {
 
 			if (JSON.stringify(data["statusCode"]) == 200) {
 				alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
-				//	alert("data: \n"+ JSON.stringify(data["dataProducts"])); 
+				 location.reload();
 
-alert("Product added to cart!!");
-				window.location.reload();
+				
+
 			} else {
 				alert("Status Code: "
 						+ JSON.stringify(data["statusCode"])
 						+ "\n Status Message:"
-						+ "Error in retreiving products");
+						+ "Error in removing item");
 
 			}
 		},
@@ -185,21 +173,22 @@ alert("Product added to cart!!");
 		}
 
 	});
-
+	}
 	
-}
-
-		
-
+	
 function formToJSON(productID) {
 	var email = $.cookie("email");
+	var emailID= email.replace(/["]+/g,'');
     return JSON.stringify({
-    "productID": $("#productID_"+productID).text(),	
-    "productName": $("#productName_"+productID).text(),
-    "productPrice": $("#productPrice_"+productID).text(),
-    "productQuantity": $("#productQuantityS_"+productID).val(),
-    "emailID":email
+    "productID": productID,	
+    "emailID":emailID
     });
+}
+</script>
+<script>
+function checkoutFun(){
+	
+	window.location.href = "billing.html";
 }
 </script>
 
@@ -215,13 +204,14 @@ function formToJSON(productID) {
 						off on orders above 50 dollars
 					</h2>
 				</div>
-	<div class="top_right">
+				<div class="top_right">
+
 		<ul>	
 			<li><p id= "userNameJQ" class ="UserNameJQ">Hi, </p></li>|
 			<li> <p id="lastLoginTime"> Your last login time was on :</p></li>|
-			<li><a href="index.html" onclick="signOutFun()">Sign Out</a></li>
+			<li><a href="index.html" onclick="signOutFun()" >Sign Out</a></li>
 		</ul>
-	</div>
+				</div>
 				<div class="clearfix"></div>
 			</div>
 		</div>
@@ -234,6 +224,7 @@ function formToJSON(productID) {
 					<h3>Online Shopping Stores</h3>
 
 					<p>CmpE 282 - Cloud Services</p>
+					
 				</div>
 				<!-- start header_right -->
 				<div >
@@ -250,8 +241,7 @@ function formToJSON(productID) {
 							
 					
 								<div class="cart" >
-									<a href="orderHistory.html" ><h5><b>Order History</b> </h5></a>
-				<a href="cartItems.html"> <img src="assets/img/cart.jpg"
+				<a href="home.html"> <img src="assets/img/cart.jpg"
 								height="70" width="70" title="View items in Cart" alt="" /></a>
 </div>	
 				</div>
@@ -361,6 +351,8 @@ function formToJSON(productID) {
 					<h3>CmpE 282 - Cloud Services</h3>
 
 					<p>Online Shopping Stores</p>
+					<h3>Order History </h3>
+					
 				</div>
 
 				<div class="content_text">
@@ -373,15 +365,15 @@ function formToJSON(productID) {
 								<th></th>
 								<th></th>
 								<th></th>
-								<th></th>
+								
 							</tr>
 							<tr>
 								<th>Product ID</th>
 								<th>Product Name</th>
 								<th>Price</th>
-								<th>Product Description</th>
 								<th>Quantity</th>
-								<th></th>
+								<th>Date and Time of Purchase</th>
+								
 							</tr>
 						</thead>
 
@@ -390,9 +382,9 @@ function formToJSON(productID) {
 								<th>Product ID</th>
 								<th>Product Name</th>
 								<th>Price</th>
-								<th>Product Description</th>
 								<th>Quantity</th>
-								<th></th>
+								<th>Date and Time of Purchase</th>
+							
 							</tr>
 						</tfoot>
 
@@ -404,7 +396,8 @@ function formToJSON(productID) {
 								<td></td>
 								<td></td>
 								<td></td>
-								<td></td>
+								
+								
 							</tr>
 
 						</tbody>
@@ -412,41 +405,6 @@ function formToJSON(productID) {
 				</div>
 			</div>
 
-			<!-- grids_of_3 -->
-			<div class="row grids">
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic1.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-							<p>read more</p>
-						</div></a>
-				</div>
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic2.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-
-							<p>read more</p>
-						</div></a>
-				</div>
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic3.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-
-							<p>read more</p>
-						</div></a>
-				</div>
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic4.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-							<h4>get scraves</h4>
-							<p>read more</p>
-						</div></a>
-				</div>
-			</div>
-			<!-- end grids_of_3 -->
 		</div>
 		<!-- end content -->
 	</div>
