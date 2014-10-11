@@ -76,7 +76,7 @@ function signOutFun(){
 		jQuery
 				.ajax({
 					type : "POST",
-					url : "http://localhost:8080/CloudServices/rest/users/getProducts",
+					url : "http://localhost:8080/CloudServices/rest/products/getProducts",
 					data : id,
 					contentType : "application/json; charset=utf-8",
 					dataType : "json",
@@ -107,8 +107,8 @@ function signOutFun(){
 										+ "<td id='productDescription_"+counter.productID+"' class='productDescription'>"
 										+ counter.productDescription
 										+ "</td>"
-										+ "<td id='productQuantity_"+counter.productID+"' class='quantity'>"
-									 	 +"<select>";
+										+ "<td class='quantity'>"
+									 	 +"<select id='productQuantity_"+counter.productID+"'>";
 									 	 
 									 	
 									 	var options ="";
@@ -150,8 +150,8 @@ function addToCart(productID)
 {
 	
 	var productName = $("#productName_"+productID).text(); //,var productPrice,var quantity, var emailID 
-	var quantity = $("#productQuantityS_"+productID).text();
-//	alert("quantity:"+ quantity);
+	var quantity = $("#productQuantity_"+productID+" option:selected").text();
+	alert("quantity:"+ quantity);
 	
 	alert(productName);
 var requestData = formToJSON(productID);
@@ -159,7 +159,7 @@ alert(requestData);
 	jQuery
 	.ajax({
 		type : "POST",
-		url : "http://localhost:8080/CloudServices/rest/users/addToCart",
+		url : "http://localhost:8080/CloudServices/rest/cart/addToCart",
 		data : requestData,
 		contentType : "application/json; charset=utf-8",
 		dataType : "json",
@@ -197,7 +197,7 @@ function formToJSON(productID) {
     "productID": $("#productID_"+productID).text(),	
     "productName": $("#productName_"+productID).text(),
     "productPrice": $("#productPrice_"+productID).text(),
-    "productQuantity": $("#productQuantityS_"+productID).val(),
+    "productQuantity": $("#productQuantity_"+productID+" option:selected").text(),
     "emailID":email
     });
 }
@@ -412,41 +412,7 @@ function formToJSON(productID) {
 				</div>
 			</div>
 
-			<!-- grids_of_3 -->
-			<div class="row grids">
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic1.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-							<p>read more</p>
-						</div></a>
-				</div>
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic2.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-
-							<p>read more</p>
-						</div></a>
-				</div>
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic3.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-
-							<p>read more</p>
-						</div></a>
-				</div>
-				<div class="col-md-3 grid1">
-					<a href="details.html"> <img src="assets/img/pic4.jpg"
-						class="img-responsive" alt="" />
-						<div class="look">
-							<h4>get scraves</h4>
-							<p>read more</p>
-						</div></a>
-				</div>
-			</div>
-			<!-- end grids_of_3 -->
+		
 		</div>
 		<!-- end content -->
 	</div>

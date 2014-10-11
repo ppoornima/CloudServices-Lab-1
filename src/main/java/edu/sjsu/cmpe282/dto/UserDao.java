@@ -14,6 +14,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodb.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeAction;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
@@ -236,34 +237,7 @@ public class UserDao {
 
 
 
-	public String getProducts(String categoryID)
-	{
 
-		JSONObject response = new JSONObject();
-		try
-		{
-			awsAuthentication();
-			JSONArray product = new JSONArray();
-			product = getProductsfromDynamoDB(categoryID);
-
-			response.put("statusCode",STATUS_SUCCESS_CODE);
-			response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
-			response.put("dataProducts",product);
-
-			System.out.println("response "+ response.toString());
-		}
-		catch (AmazonServiceException ase) {
-			System.err.println(ase.getMessage());
-
-			response.put("statusCode",STATUS_ERROR_CODE);
-			response.put("statusMessage", STATUS_ERROR_MESSAGE);
-			return response.toString();
-
-		} 
-
-		return response.toString();
-
-	}
 
 	public void awsAuthentication()
 	{
@@ -276,41 +250,7 @@ public class UserDao {
 
 	}
 
-	public JSONArray getProductsfromDynamoDB(String categoryID)
-	{
-		String tableName = "products";
 
-		HashMap<String, Condition> scanFilter = new HashMap<String, Condition>();
-
-		Condition hashKeyCondition = new Condition().withComparisonOperator(
-				ComparisonOperator.EQ.toString()).withAttributeValueList(new AttributeValue().withS(categoryID));
-
-		scanFilter.put("categoryID", hashKeyCondition);
-		ScanRequest scanRequest = new ScanRequest(tableName).withScanFilter(scanFilter);
-		ScanResult scanResult = client.scan(scanRequest);
-
-
-
-		List<Map<String, AttributeValue>> items = scanResult.getItems();
-		JSONArray array = new JSONArray();
-		for (Map<?, ?> item : items) {
-			Set s = item.keySet();  
-			Iterator i  = s.iterator(); 
-			JSONObject p = new JSONObject();
-
-			while(i.hasNext()) {
-
-				String key =  (String) i.next();
-				String value = item.get(key).toString();
-				String actualValue = (value.substring(3,(value.length())-2));
-				p.put(key, actualValue.trim());
-			}
-			array.put(p);
-			//	System.out.println("ITEM:"+ item);
-		}
-		return array;
-
-	}
 
 
 	public String getCatalog()
@@ -458,97 +398,8 @@ public class UserDao {
 
 	}
 
-	public String removeFromCart(String cartItem)
-	{
-		awsAuthentication();
 
-		JSONObject cItem = new JSONObject(cartItem);
-		String emailID= cItem.get("emailID").toString();
-		String productID= cItem.get("productID").toString();
-		String tableName = "cart";
-		JSONObject response = new JSONObject();
-
-		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
-		attributeList.put("emailID", new AttributeValue().withS(emailID));
-		attributeList.put("productID", new AttributeValue().withS(productID));
-
-		for (Map.Entry<String, AttributeValue> item : attributeList.entrySet()) {
-			String attributeName = item.getKey();
-			AttributeValue value = item.getValue();
-			System.out.println("AttributeName"+ attributeName+"\t value "+value);
-		}
-
-
-		DeleteItemRequest deleteItemRequest = new DeleteItemRequest()
-		.withTableName(tableName).withKey(attributeList);
-
-		DeleteItemResult deleteItemResult = client.deleteItem(deleteItemRequest);
-		System.out.println("DELETE ITEM RESULT"+ deleteItemResult);
-
-
-		response.put("statusCode",STATUS_SUCCESS_CODE);
-		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
-
-		return response.toString();
-	}
-
-	public String updateCart(String cartDetails)
-	{
-
-		System.out.println("CART DETAILS : "+ cartDetails);
-		JSONObject cart =  new JSONObject(  cartDetails);
-
-		int emailIDLength = cart.get("emailID").toString().length();
-		String emailID = cart.get("emailID").toString().substring(1,emailIDLength-1);
-		String productID =  cart.get("productID").toString();
-		String quantity="3";  // cart.get("productQuantity").toString();
-		String productName = cart.get("productName").toString() ;
-		String productPrice = cart.get("productPrice").toString();
-
-
-		JSONObject response = new JSONObject();
-
-		awsAuthentication();
-		String tableName = "cart";
-		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
-		String timestamp= getCurrentDateTime();
-
-
-
-		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
-		attributeList.put("emailID", new AttributeValue().withS(emailID));
-		attributeList.put("productID", new AttributeValue().withS(productID));
-
-
-
-		updateItems.put("quantity", 
-				new AttributeValueUpdate()
-		.withAction(AttributeAction.ADD)
-		.withValue(new AttributeValue().withN("+"+quantity)));
-
-		updateItems.put("productName", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(productName)));
-
-		updateItems.put("timestamp", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(timestamp)));
-		updateItems.put("productPrice", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(productPrice)));
-
-
-		UpdateItemRequest updateItemRequest = new UpdateItemRequest()
-		.withTableName(tableName)
-		.withKey(attributeList)
-		.withAttributeUpdates(updateItems);
-
-
-
-		UpdateItemResult result = client.updateItem(updateItemRequest);
-		response.put("statusCode",STATUS_SUCCESS_CODE);
-		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
-		return response.toString();
-
-	}
-
+	
 	public String viewItemsInCart (String emailID)
 	{
 		JSONObject response = new JSONObject();
@@ -669,17 +520,20 @@ System.out.println("------------------------");
 				JSONObject item = array.getJSONObject(i);
 				String productID = item.get("productID").toString().trim() ;	
 				int quantity = Integer.parseInt(item.get("quantity").toString().trim()) ;
-				int totalPrice = Integer.parseInt(item.get("productPrice").toString().trim())*quantity;
+				int price = Integer.parseInt(item.get("productPrice").toString().trim());
+				int totalPrice = price*quantity;
+				String productName =item.get("productName").toString();
+				
 				String dop = getCurrentDateTime();
 				stmt = conn.createStatement();
-				String query = "INSERT INTO `cloudservices`.`orderPayments` (`emailID`, `productID`, `productName`, `productQuantity`,`productPrice`,`DOP`) VALUES ('" + emailID + "', '" + productID+ "', '" +item.get("productName").toString() + "', '" + quantity+ "','"+ totalPrice+"','"+dop+"');";
+				String query = "INSERT INTO `cloudservices`.`orderPayments` (`emailID`, `productID`, `productName`, `productQuantity`,`productPrice`,`DOP`) VALUES ('" + emailID + "', '" + productID+ "', '" +productName + "', '" + quantity+ "','"+ totalPrice+"','"+dop+"');";
 				stmt.executeUpdate(query);
 
 				/*     Remove from cart         */
 				String removeItemStatus = removeFromCartAfterOrder(emailID, productID);
-			//	String  deductStatus=  deductProductQuantity(productID,quantity);
+				String  deductStatus=  deductProductQuantity(productID,quantity);
 				System.out.println("Remove Item Status "+removeItemStatus);
-		//	System.out.println("deduct Quantity Status"+ deductStatus);
+		System.out.println("deduct Quantity Status"+ deductStatus);
 			}
 
 			response.put("statusCode",STATUS_SUCCESS_CODE);
@@ -747,12 +601,14 @@ System.out.println("------------------------");
 		String tableName = "products";
 		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
 		//String timestamp= getCurrentDateTime();
+		JSONObject item=  getProductByIDFromDynamoDB(productID);
 
+	    HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
+				key.put("productID", new AttributeValue().withN(productID.trim()));
 
-
-		Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
+	//	Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
 	//	attributeList.put("emailID", new AttributeValue().withS(emailID));
-		attributeList.put("productID", new AttributeValue().withS(productID));
+	//	attributeList.put("productID", new AttributeValue().withS(productID));
 
 
 
@@ -761,23 +617,32 @@ System.out.println("------------------------");
 		.withAction(AttributeAction.ADD)
 		.withValue(new AttributeValue().withN("-"+quantity)));
 
-	/*	updateItems.put("productName", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(productName)));
+	updateItems.put("productName", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(item.get("productName").toString())));
 
-		updateItems.put("timestamp", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(timestamp)));
+		updateItems.put("categoryID", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(item.get("categoryID").toString())));
 		updateItems.put("productPrice", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(productPrice)));*/
+				.withValue(new AttributeValue().withN(item.get("productPrice").toString().trim())));
+		
 
-
+		updateItems.put("productDescription", new AttributeValueUpdate().withAction(AttributeAction.PUT)
+				.withValue(new AttributeValue().withS(item.get("productDescription").toString())));
+		
+		
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest()
 		.withTableName(tableName)
-		.withKey(attributeList)
+		.withKey(key)
 		.withAttributeUpdates(updateItems);
 
 
 
 		UpdateItemResult result = client.updateItem(updateItemRequest);
+		
+
+/*catch (AmazonServiceException ase) {
+    System.err.println("Error updating item in  table products" );
+} */ 
 		response.put("statusCode",STATUS_SUCCESS_CODE);
 		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
 		return response.toString();
@@ -838,62 +703,10 @@ System.out.println("------------------------");
 
 	}
 
-	public String addCatalog(String catalogDetails)
-	{
-		JSONObject catalogs = new JSONObject(catalogDetails);
-
-		String catalogName= catalogs.get("catalogName").toString();
-		String catalogID = catalogs.get("catalogID").toString();
-
-		JSONObject response = new JSONObject();
-		awsAuthentication();
-		String tableName = "catalog" ;
-		Map<String, AttributeValue> catalog = new HashMap<String, AttributeValue>();
-		PutItemRequest catalogRequest = new PutItemRequest().withTableName(tableName).withItem(catalog);
-
-		catalog.put("catalogID", new AttributeValue().withS(catalogID));
-		catalog.put("catalogName", new AttributeValue().withS(catalogName));
-		catalogRequest = new PutItemRequest().withTableName("catalog").withItem(catalog);
-		client.putItem(catalogRequest);
-
-
-		response.put("statusCode",STATUS_SUCCESS_CODE);
-		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
-		return response.toString();
 
 
 
 
-	}
-
-
-	public String addProduct(String productDeatils)
-	{
-
-		JSONObject product = new JSONObject(productDeatils);
-		JSONObject response = new JSONObject();
-		awsAuthentication();
-		String tableName = "products";
-
-		Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-
-		PutItemRequest itemRequest = new PutItemRequest().withTableName(tableName).withItem(item);
-
-		item.put("productID", new AttributeValue().withN( product.get("productID").toString()));
-		item.put("productName", new AttributeValue().withS(product.get("productName").toString()));
-		item.put("productDescription", new AttributeValue().withS(product.get("productDescription").toString()));
-		item.put("productPrice", new AttributeValue().withN(product.get("productPrice").toString()));
-		item.put("quantity", new AttributeValue().withN(product.get("quantity").toString()));
-		item.put("categoryID", new AttributeValue().withS(product.get("categoryID").toString()));
-
-		client.putItem(itemRequest);
-
-
-		response.put("statusCode",STATUS_SUCCESS_CODE);
-		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
-		return response.toString();
-
-	}
 
 	public static void main(String[] args)
 	{
@@ -919,7 +732,10 @@ System.out.println("------------------------");
 		//new UserDao().mainMenuLoad();
 		//new UserDao().viewItemsInCart("pooja@gmail.com");
 		//new UserDao().addOrderPayment("pooja@gmail.com");
-		new UserDao().orderHistory("pooja@gmail.com");
+	//	new UserDao().orderHistory("pooja@gmail.com");
+		
+	//	new UserDao().deductProductQuantity("3", 3);
+		
 	}
 
 }

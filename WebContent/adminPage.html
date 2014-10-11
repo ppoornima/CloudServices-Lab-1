@@ -107,7 +107,7 @@ function signOutFun(){
 	 alert("Catalog to be added- "+ $('#catalogName').val())
  jQuery.ajax({
      type: "POST",
-     url: "http://localhost:8080/CloudServices/rest/users/addCatalog",
+     url: "http://localhost:8080/CloudServices/rest/admin/addCatalog",
     data: formToJSON(),
      contentType: "application/json; charset=utf-8",
      dataType: "json",
@@ -130,6 +130,7 @@ function signOutFun(){
      		  
      		
      		}  */
+     		window.location.reload();
  			
  			}
  		else
@@ -156,11 +157,11 @@ function signOutFun(){
 <script type="text/javascript">
  function addProductFun()
  {
-	 alert("button clicked");
-	 alert("Catalog to be added- "+ $('#catalogName').val())
+	// alert("button clicked");
+	// alert("Catalog to be added- "+ $('#catalogName').val())
  jQuery.ajax({
      type: "POST",
-     url: "http://localhost:8080/CloudServices/rest/users/addProduct",
+     url: "http://localhost:8080/CloudServices/rest/admin/addProduct",
     data: formToJSON1(),
      contentType: "application/json; charset=utf-8",
      dataType: "json",
@@ -169,7 +170,8 @@ function signOutFun(){
      	if(JSON.stringify(data["statusCode"])== 200 )
  		{
      	 	alert("Status code : "+ JSON.stringify(data["statusCode"])+"\n Status message: "+ JSON.stringify(data["statusMessage"]) );
-     			
+     			alert("Product Added!!");
+     			window.location.reload();
  			}
  		else
  			{
@@ -443,7 +445,7 @@ function signOutFun(){
 				</div>	
 				<div>
 					<label>
-						<input id="categoryID" placeholder="Category ID" type="text" tabindex="4" required>
+						<input id="categoryID" placeholder="Category ID" type="text" tabindex="8" required>
 					</label>
 				</div>							
 				<div>
