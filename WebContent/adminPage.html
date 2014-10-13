@@ -51,14 +51,14 @@ function signOutFun(){
 
 }
 </script>
-
+<script src="constants.js"></script>
  <script type="text/javascript">
  function getCatalog()
  {
 	 alert("button clicked");
  jQuery.ajax({
      type: "POST",
-     url: "http://localhost:8080/CloudServices/rest/users/getCatalog",
+     url: "/CloudServices/rest/users/getCatalog",
     // data: "101",
      contentType: "application/json; charset=utf-8",
      dataType: "json",
@@ -107,7 +107,7 @@ function signOutFun(){
 	 alert("Catalog to be added- "+ $('#catalogName').val())
  jQuery.ajax({
      type: "POST",
-     url: "http://localhost:8080/CloudServices/rest/admin/addCatalog",
+     url: "/cloudservices/rest/admin/addCatalog",
     data: formToJSON(),
      contentType: "application/json; charset=utf-8",
      dataType: "json",
@@ -161,7 +161,7 @@ function signOutFun(){
 	// alert("Catalog to be added- "+ $('#catalogName').val())
  jQuery.ajax({
      type: "POST",
-     url: "http://localhost:8080/CloudServices/rest/admin/addProduct",
+     url: "/cloudservices/rest/admin/addProduct",
     data: formToJSON1(),
      contentType: "application/json; charset=utf-8",
      dataType: "json",

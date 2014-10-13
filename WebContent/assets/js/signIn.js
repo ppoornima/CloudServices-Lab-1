@@ -1,6 +1,10 @@
+var IP ="54.215.164.205";
+
+
+
 function LogInfun(){
 
-	var URL = "http://localhost:8080/CloudServices/rest/users/signin";
+	var URL = "/cloudservices/rest/users/signin";
 	
 	alert("signin button clicked");//+formToJSON());
 	
@@ -15,8 +19,8 @@ function LogInfun(){
 				//success: function () { //success(data); }
 			success: function(redir, textStatus, jqXHR){
 					alert("you are logged in");
-					location.href="http://localhost:8080/CloudServices/index1.html";
-						//"http://localhost:8080/CloudServices/rest/users/home";
+					location.href="http://" + IP +"/CloudServices/index1.html";
+						//"http://" + IP +"/CloudServices/rest/users/home";
 				},
 			error: function(textStatus, jqXHR,errorThrown){
 				alert(textStatus+" "+jqXHR);

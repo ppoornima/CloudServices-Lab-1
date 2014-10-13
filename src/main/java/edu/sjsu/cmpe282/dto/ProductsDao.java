@@ -58,7 +58,6 @@ public class ProductsDao {
 			response.put("statusCode",STATUS_SUCCESS_CODE);
 			response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
 			response.put("dataProducts",product);
-
 			System.out.println("response "+ response.toString());
 		}
 		catch (AmazonServiceException ase) {
@@ -91,7 +90,7 @@ public class ProductsDao {
 
 
 		List<Map<String, AttributeValue>> items = scanResult.getItems();
-		JSONArray array = new JSONArray();
+		JSONArray array = new JSONArray(); int k= 1;
 		for (Map<?, ?> item : items) {
 			Set s = item.keySet();  
 			Iterator i  = s.iterator(); 
@@ -105,9 +104,19 @@ public class ProductsDao {
 				p.put(key, actualValue.trim());
 			}
 			array.put(p);
-			//	System.out.println("ITEM:"+ item);
+			k++;
+	System.out.println("ITEM:"+ p.toString());
 		}
+		System.out.println("Number of items:"+ k);
+		System.out.println(array.toString());
 		return array;
 
+	}
+	
+	public static void main(String[] args)
+	{
+		
+		new ProductsDao().getProducts("100");
+		
 	}
 }

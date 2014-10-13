@@ -63,7 +63,7 @@ function signOutFun(){
 }
 </script>
 
-
+<script src="constants.js"></script>
 <script type="text/javascript">
 	var queryString = window.location.search;
 	queryString = queryString.substring(1);
@@ -76,7 +76,7 @@ function signOutFun(){
 		jQuery
 				.ajax({
 					type : "POST",
-					url : "http://localhost:8080/CloudServices/rest/products/getProducts",
+					url : "/cloudservices/rest/products/getProducts",
 					data : id,
 					contentType : "application/json; charset=utf-8",
 					dataType : "json",
@@ -159,7 +159,7 @@ alert(requestData);
 	jQuery
 	.ajax({
 		type : "POST",
-		url : "http://localhost:8080/CloudServices/rest/cart/addToCart",
+		url : "/cloudservices/rest/cart/addToCart",
 		data : requestData,
 		contentType : "application/json; charset=utf-8",
 		dataType : "json",

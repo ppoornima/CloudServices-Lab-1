@@ -47,7 +47,7 @@ public class UserDao {
 	Statement stmt = null;
 	static AmazonDynamoDBClient client = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
 
-	// Constructure with JDBC connection
+	// Constructor with JDBC connection
 	public UserDao()
 	{
 		try{
@@ -399,7 +399,7 @@ public class UserDao {
 	}
 
 
-	
+
 	public String viewItemsInCart (String emailID)
 	{
 		JSONObject response = new JSONObject();
@@ -523,7 +523,7 @@ System.out.println("------------------------");
 				int price = Integer.parseInt(item.get("productPrice").toString().trim());
 				int totalPrice = price*quantity;
 				String productName =item.get("productName").toString();
-				
+
 				String dop = getCurrentDateTime();
 				stmt = conn.createStatement();
 				String query = "INSERT INTO `cloudservices`.`orderPayments` (`emailID`, `productID`, `productName`, `productQuantity`,`productPrice`,`DOP`) VALUES ('" + emailID + "', '" + productID+ "', '" +productName + "', '" + quantity+ "','"+ totalPrice+"','"+dop+"');";
@@ -531,9 +531,12 @@ System.out.println("------------------------");
 
 				/*     Remove from cart         */
 				String removeItemStatus = removeFromCartAfterOrder(emailID, productID);
+				
+				/* Deducting the product quantity from products table */
 				String  deductStatus=  deductProductQuantity(productID,quantity);
+				
 				System.out.println("Remove Item Status "+removeItemStatus);
-		System.out.println("deduct Quantity Status"+ deductStatus);
+				System.out.println("deduct Quantity Status"+ deductStatus);
 			}
 
 			response.put("statusCode",STATUS_SUCCESS_CODE);
@@ -553,8 +556,6 @@ System.out.println("------------------------");
 
 		}
 
-
-		//System.out.println(response.toString());
 		return response.toString();
 	}
 
@@ -590,8 +591,8 @@ System.out.println("------------------------");
 
 		return response.toString();
 	}
-	
-	
+
+
 	public String deductProductQuantity(String productID, int quantity)
 	{
 
@@ -600,51 +601,26 @@ System.out.println("------------------------");
 		awsAuthentication();
 		String tableName = "products";
 		Map<String, AttributeValueUpdate> updateItems = new HashMap<String, AttributeValueUpdate>();
-		//String timestamp= getCurrentDateTime();
+
 		JSONObject item=  getProductByIDFromDynamoDB(productID);
-
-	    HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
-				key.put("productID", new AttributeValue().withN(productID.trim()));
-
-	//	Map<String, AttributeValue> attributeList = new HashMap<String, AttributeValue>();
-	//	attributeList.put("emailID", new AttributeValue().withS(emailID));
-	//	attributeList.put("productID", new AttributeValue().withS(productID));
-
-
+		HashMap<String, AttributeValue> key = new HashMap<String, AttributeValue>();
+		key.put("productID", new AttributeValue().withN(productID.trim()));
 
 		updateItems.put("quantity", 
 				new AttributeValueUpdate()
 		.withAction(AttributeAction.ADD)
 		.withValue(new AttributeValue().withN("-"+quantity)));
 
-	updateItems.put("productName", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(item.get("productName").toString())));
-
-		updateItems.put("categoryID", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(item.get("categoryID").toString())));
-		updateItems.put("productPrice", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withN(item.get("productPrice").toString().trim())));
-		
-
-		updateItems.put("productDescription", new AttributeValueUpdate().withAction(AttributeAction.PUT)
-				.withValue(new AttributeValue().withS(item.get("productDescription").toString())));
-		
-		
 		UpdateItemRequest updateItemRequest = new UpdateItemRequest()
 		.withTableName(tableName)
 		.withKey(key)
 		.withAttributeUpdates(updateItems);
 
-
-
 		UpdateItemResult result = client.updateItem(updateItemRequest);
-		
 
-/*catch (AmazonServiceException ase) {
-    System.err.println("Error updating item in  table products" );
-} */ 
 		response.put("statusCode",STATUS_SUCCESS_CODE);
 		response.put("statusMessage", STATUS_SUCCESS_MESSAGE);
+		System.out.println(response.toString());
 		return response.toString();
 
 	}
@@ -670,12 +646,7 @@ System.out.println("------------------------");
 				obj.put("productQuantity", rs.getInt("productQuantity"));
 				obj.put("productPrice", rs.getInt("productPrice"));
 				obj.put("dop", rs.getString("dop"));
-				/*orderID = rs.getString("orderID");
-	productID =  rs.getString("productID");
-	productName =  rs.getString("productName");
-	productQuantity =  rs.getInt("productQuantity");
-	productPrice = rs.getInt("productPrice");
-	dop =rs.getString("dop");*/
+
 
 				array.put(obj);
 			}
@@ -732,10 +703,10 @@ System.out.println("------------------------");
 		//new UserDao().mainMenuLoad();
 		//new UserDao().viewItemsInCart("pooja@gmail.com");
 		//new UserDao().addOrderPayment("pooja@gmail.com");
-	//	new UserDao().orderHistory("pooja@gmail.com");
-		
-	//	new UserDao().deductProductQuantity("3", 3);
-		
+		//	new UserDao().orderHistory("pooja@gmail.com");
+
+		new UserDao().deductProductQuantity("3", 3);
+
 	}
 
 }

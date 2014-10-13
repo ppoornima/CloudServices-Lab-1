@@ -1,10 +1,13 @@
+var IP = "54.215.164.205";
+
+
 function signUpfun(){
 	
 alert('user  '+ formToJSON());	
 
 jQuery.ajax({
     type: "POST",
-    url: "http://localhost:8080/CloudServices/rest/users/signup",
+    url: "/cloudservices/rest/users/signup",
     data: formToJSON(),
     contentType: "application/json; charset=utf-8",
     dataType: "json",

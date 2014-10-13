@@ -54,7 +54,7 @@ function signOutFun(){
 
 }
 </script>
-
+<script src="constants.js"></script>
 <script>
 
 function orderFun(){
@@ -68,7 +68,7 @@ function orderFun(){
 	   jQuery
 		.ajax({
 			type : "POST",
-			url : "http://localhost:8080/CloudServices/rest/users/addPayment",
+			url : "/cloudservices/rest/users/addPayment",
 			data : emailID,
 			contentType : "application/json; charset=utf-8",
 			dataType : "json",
@@ -291,27 +291,38 @@ function orderFun(){
 			<form id="registration_form" onsubmit="return false;">
 				<div>
 					<label>
-						<input id="creditCard" placeholder="Credit Card Number(has to be 16 -digits only)"  type="text" tabindex="1" pattern="^[0-9]{16}$" required autofocus>
+					Credit Card Number:<input id="creditCard" placeholder="(has to be 16 -digits only)"  type="text" tabindex="1" pattern="^[0-9]{16}$" required autofocus>
 					</label>
 				</div>
 				<div>
 					<label>
-						<input id="passwd"  placeholder="password" type="password" tabindex="2" required>
+						Name on Card:   <input id="nameOnCard"  placeholder="Name on Card" type="text" tabindex="2" required>
 					</label>
-				</div>						
+				</div>	
 				<div>
 					<label>
-						<input id="repasswd"  placeholder="retype password" type="password" tabindex="3" required>
+					Card Expiry Month:	<input id="expMonth"   type="number" min="1" max="12" tabindex="2" required>
+					</label>
+					&nbsp
+					<label>
+					Card Expiry Year:	<input id="expYear"  type="number" min="2014" max="2030"  tabindex="2" required>
+					</label>
+					
+				</div>	
+									
+				<div>
+					<label>
+				CVV:	<input id="cvv"  placeholder="CVV" type="number" pattern="^[0-9]{3}$" tabindex="3" required>
 					</label>
 				</div>
 				<div>
 					<label>
-						<input id="BillingAddress" placeholder=" Billing Address" type="text" maxlength="30" tabindex="4" required autofocus>
+					Billing Address: 	<input id="BillingAddress" placeholder=" Billing Address" type="text" maxlength="30" tabindex="4" required autofocus>
 					</label>
 				</div>
 				<div>
 					<label>
-						<input id="ShippingAddress" placeholder=" Shipping Address" type="text" maxlength="30" tabindex="5" required autofocus>
+					 Shipping Address:  	<input id="ShippingAddress" placeholder=" Shipping Address" type="text" maxlength="30" tabindex="5" required autofocus>
 					</label>
 				</div>
 				

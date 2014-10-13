@@ -40,6 +40,7 @@
 	
 	<script src="../assets/js/bootstrap.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+	<script src="constants.js"></script>
 	<!--  script src="../assets/js/signIn.js"></script> -->
 	
 	<script type="text/javascript">
@@ -50,7 +51,7 @@
 	
 function LogInfun(){
 
-	var URL = "http://localhost:8080/CloudServices/rest/users/signin";
+	var URL = "http://"+IP+"/CloudServices/rest/users/signin";
 	alert("signin button clicked");//+formToJSON());
 	
 	$.ajax({
@@ -62,7 +63,7 @@ function LogInfun(){
 				//success: function () { //success(data); }
 			success: function(data, textStatus, jqXHR){
 					alert("you are logged in");
-					redirectURL = "http://localhost:8080/CloudServices/index.html";
+					redirectURL = "http://"+IP+"/CloudServices/index.html";
 				},
 			error: function(textStatus, jqXHR,errorThrown){
 				alert(textStatus+" "+jqXHR);

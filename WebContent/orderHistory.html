@@ -63,7 +63,7 @@ function signOutFun(){
 
 }
 </script>
-
+<script src="constants.js"></script>
 
 <script type="text/javascript">
 	var queryString = window.location.search;
@@ -79,7 +79,7 @@ var emailID= email.replace(/["]+/g,'');
 		jQuery
 				.ajax({
 					type : "POST",
-					url : "http://localhost:8080/CloudServices/rest/users/orderHistory",
+					url : "/cloudservices/rest/users/orderHistory",
 					data : emailID,
 					contentType : "application/json; charset=utf-8",
 					dataType : "json",
@@ -147,7 +147,7 @@ function removeFromCartFun(productID)
 	jQuery
 	.ajax({
 		type : "POST",
-		url : "http://localhost:8080/CloudServices/rest/users/orderHistory",
+		url : "/cloudservices/rest/users/orderHistory",
 		data : cartData,
 		contentType : "application/json; charset=utf-8",
 		dataType : "json",

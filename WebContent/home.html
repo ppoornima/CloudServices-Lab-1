@@ -51,14 +51,14 @@ function signOutFun(){
 
 }
 </script>
-
+<script src="constants.js"></script>
  <script type="text/javascript">
  function getCatalog()
  {
 	 alert("button clicked");
  jQuery.ajax({
      type: "POST",
-     url: "http://localhost:8080/CloudServices/rest/users/getCatalog",
+     url: "/cloudservices/rest/users/getCatalog",
     // data: "101",
      contentType: "application/json; charset=utf-8",
      dataType: "json",
@@ -158,7 +158,7 @@ function signOutFun(){
 				</div>
 		<!-- start header menu -->
 		<ul class="megamenu skyblue" id ="catalogList">
-			<li><a class="color1" href="index1.html">Home</a></li>
+			<li><a class="color1" href="index.html">Home</a></li>
 			<li class="grid"><a class="color2" href="#">Computers</a>
 				<div class="megapanel">
 					<div class="row">
